@@ -1,0 +1,43 @@
+
+$color-background: #f6fafb;
+$color-default-text: #273240;
+$color-preto-12: #e0e0e0;
+$color-preto-60: #666;
+$color-cyano: #02aeef;
+$color-green: hsla(160, 100%, 37%, 1);
+$color-green-hover:  hsla(160, 100%, 37%, 0.2);
+$color-white: #fff;
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100vh;
+  color: $color-default-text;
+  background: $color-background;
+  transition: color 0.5s, background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -1,23 +1,25 @@
-@import './base.css';
+@use './base.scss';
 
 #app {
-  max-width: 1280px;
+  width: 100%;
+  height: 100vh;
   margin: 0 auto;
   padding: 2rem;
   font-weight: normal;
 }
 
-a,
 .green {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
+  color: base.$color-green;
   transition: 0.4s;
   padding: 3px;
 }
 
+
 @media (hover: hover) {
   a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+    background-color: base.$color-green-hover;
+    opacity: 0.8;
   }
 }
 
@@ -26,10 +28,5 @@ a,
     display: flex;
     place-items: center;
   }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
 }
+
