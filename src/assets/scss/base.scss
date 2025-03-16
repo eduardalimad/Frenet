@@ -53,8 +53,8 @@ input{
   width: 100%;
 }
 .p-floatlabel:has(input:focus) label, .p-inputtext:enabled:focus{
-  border-color: rebeccapurple !important;
-  color:  rebeccapurple !important;
+  border-color: $color-cyano !important;
+  color:  $color-cyano !important;
 }
 .p-inputtext:enabled:focus{
   color:  #334155!important;
