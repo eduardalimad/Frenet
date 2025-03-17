@@ -55,7 +55,8 @@ const localValue = ref(props.modelValue);
 const emit = defineEmits(["update:modelValue"]);
 
 watch(localValue, (newValue) => {
-  emit("update:modelValue", newValue);
+  const valueWithDot = newValue.replace(",", ".");
+  emit("update:modelValue", Number(valueWithDot));
 });
 
 const handleBlur = () => {
