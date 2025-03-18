@@ -28,7 +28,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import InputNumber from "@/components/InputNumber.vue";
 import boxImage from "../assets/images/box.vue";
 import FreightForm from "@/components/FreightForm.vue";
 </script>
