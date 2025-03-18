@@ -7,6 +7,7 @@ import Dialog from "primevue/dialog";
 import FloatLabel from 'primevue/floatlabel';
 import InputNumber from 'primevue/inputnumber';
 import InputMask from 'primevue/inputmask';
+import Message  from 'primevue/message';
 
 
 const options: {
@@ -32,7 +33,7 @@ const options: {
 };
 
 
-const components = [InputNumber,FloatLabel, Button, InputText, InputMask, Dialog];
+const components = [InputNumber,FloatLabel, Button, InputText, InputMask, Dialog, Message];
 
 export default function registerPrimeVue(App: any): void {
   App.use(PrimeVue, options);

@@ -30,7 +30,7 @@ import { ref, computed, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    modelValue: string | number | null;
+    modelValue: string | null;
     title: string;
     mask?: string;
     suffix?: string;
@@ -45,7 +45,7 @@ const props = withDefaults(
 );
 
 const isTouched = ref(false);
-const localValue = ref(props.modelValue);
+const localValue = ref<string>(props.modelValue ?? "");
 const emit = defineEmits(["update:modelValue"]);
 
 watch(localValue, (newValue) => {

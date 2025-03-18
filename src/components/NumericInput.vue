@@ -8,7 +8,6 @@
           v-model="localValue"
           :id="idLabel"
           :invalid="isTouched && !localValue"
-          style="width: 100%"
           class="font-bold block mb-2"
           @blur="handleBlur"
         />
@@ -19,7 +18,6 @@
           v-model="localValue"
           :id="idLabel"
           :invalid="isTouched && !localValue"
-          style="width: 100%"
           class="font-bold block mb-2"
           @blur="handleBlur"
         />
@@ -50,11 +48,12 @@ const props = withDefaults(
   }
 );
 const isTouched = ref(false);
-const localValue = ref(props.modelValue);
-
+const localValue = ref<string | null>(
+  typeof props.modelValue === 'number' ? String(props.modelValue) : props.modelValue
+);
 const emit = defineEmits(["update:modelValue"]);
 
-watch(localValue, (newValue) => {
+watch(localValue, (newValue: any) => {
   const valueWithDot = newValue.replace(",", ".");
   emit("update:modelValue", Number(valueWithDot));
 });
