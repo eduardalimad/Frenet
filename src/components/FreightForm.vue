@@ -6,7 +6,7 @@
         idLabel="cepOrigem"
         v-model="data.cep_origem"
         mask="99999-999"
-        @change="() => request('origem')"
+        @change="() => debouncedRequest('origem')"
         :message="cepOrigem"
       />
 
@@ -15,7 +15,7 @@
         idLabel="cepDestino"
         v-model="data.cep_destino"
         mask="99999-999"
-        @change="() => request('destino')"
+        @change="() => debouncedRequest('destino')"
         :message="cepDestino"
       />
 
@@ -62,14 +62,18 @@
         suffix=" R$"
         keyfilterType="money"
       />
+      <pre>{{ data }}</pre>
     </form>
-    <Button label="Buscar" severity="info" class="btn-search" />
+    <Button label="Buscar" severity="info" @click="submit" class="btn-search" />
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
+import { debounce } from "lodash";
 import NumericInput from "@/components/NumericInput.vue";
 import MaskedInput from "@/components/MaskedInput.vue";
+import http from "../services/apiService.ts";
+import type { CepInfo, CepState } from "cep-types";
 
 const cepOrigem = ref("");
 const erroOrigem = ref(false);
@@ -86,7 +90,30 @@ const data = ref({
   valor: null,
 });
 
-const handleCepResponse = (json, cepType, states) => {
+const submit = async () => {
+  const data = {
+    SellerCEP: "04757020",
+    RecipientCEP: "14270000",
+    ShipmentInvoiceValue: 320.685,
+    ShippingItemArray: [
+      {
+        Height: 5,
+        Length: 15,
+        Quantity: 1,
+        Weight: 0.5,
+        Width: 29,
+      },
+    ],
+    RecipientCountry: "BR",
+  };
+  try {
+    const response = await http.listProvidingQuotes(data);
+    console.log(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+const handleCepResponse = (json: CepInfo, cepType: string, states: { [key: string]: CepState }) => {
   const isValid = json.localidade && json.uf;
   const field = states[cepType];
 
@@ -99,21 +126,25 @@ const handleCepResponse = (json, cepType, states) => {
   }
 };
 
-const request = async (cepType) => {
+const request = async (cepType: string) => {
   try {
     const cep = (cepType === "origem" ? data.value.cep_origem : data.value.cep_destino)
       .toString()
       .replace(/\D/g, "");
 
-    const res = await http.searchCep(cep, cepType);
-    handleCepResponse(res.data, cepType, {
-      origem: { cep: cepOrigem, error: erroOrigem },
-      destino: { cep: cepDestino, error: erroDestino },
-    });
+    if (cep.length === 8) {
+      const res = await http.searchCep(cep);
+      handleCepResponse(res.data, cepType, {
+        origem: { cep: cepOrigem, error: erroOrigem },
+        destino: { cep: cepDestino, error: erroDestino },
+      });
+    }
   } catch (error) {
     console.error("Erro ao buscar o CEP:", error);
   }
 };
+
+const debouncedRequest = debounce(request, 1000);
 </script>
 <style lang="scss" scoped>
 .freight-form {
