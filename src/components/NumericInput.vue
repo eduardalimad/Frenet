@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-input">
     <div class="input-wrapper">
       <FloatLabel variant="on">
         <InputText

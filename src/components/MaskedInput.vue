@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-input">
     <div class="input-wrapper">
       <FloatLabel variant="on">
         <InputMask
@@ -61,14 +61,3 @@ const shouldShowMessage = computed(() => {
 });
 </script>
 
-<style scoped>
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.suffix {
-  margin-left: 8px;
-}
-</style>

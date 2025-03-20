@@ -52,6 +52,18 @@ body {
 input{
   width: 100%;
 }
+.container-input{
+  width: 100%;
+}
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.suffix {
+  margin-left: 8px;
+}
 .p-floatlabel:has(input:focus) label, .p-inputtext:enabled:focus{
   border-color: $color-cyano !important;
   color:  $color-cyano !important;
