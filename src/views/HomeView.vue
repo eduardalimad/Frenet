@@ -13,9 +13,7 @@
     <main class="freight-main">
       <section class="freight-card">
         <h2 class="card-subtitle">Calculadora de Fretes Simplificada</h2>
-        <p class="card-description">
-          Faça sua cotação nas principais transportadoras do país
-        </p>
+        <p class="card-description">Faça sua cotação nas principais transportadoras do país</p>
 
         <div class="freight-content">
           <FreightForm class="form-freight" />
@@ -131,7 +129,7 @@ import FreightForm from "@/components/FreightForm.vue";
 
       .freight-content {
         display: grid;
-        grid-template-columns: 1fr 20rem;
+        grid-template-columns: 1fr repeat(auto-fit, minmax(20rem, 1fr));
         grid-column-gap: 0;
 
         .form-freight {
@@ -140,7 +138,8 @@ import FreightForm from "@/components/FreightForm.vue";
 
         .image-box {
           grid-area: 1 / 2 / 2 / 3;
-          margin-bottom: 1.5rem;
+          width: 75%;
+          margin-left: auto;
         }
       }
     }
@@ -178,7 +177,7 @@ import FreightForm from "@/components/FreightForm.vue";
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 799px) {
   .containerPage .freight-main .freight-card .freight-content {
     grid-template-columns: 1fr;
   }
