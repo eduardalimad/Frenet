@@ -5,7 +5,7 @@
         <img src="../assets/images/logo-frenet.png" alt="" />
         <div>
           <router-link to="/">Simule seu Frete</router-link>
-          <router-link to="/about">Parceiros</router-link>
+          <!-- <router-link to="/about">Parceiros</router-link> -->
         </div>
       </nav>
       <h1 class="title-header">Simular Frete</h1>
@@ -22,12 +22,43 @@
           </div>
         </div>
       </section>
+      <div
+        class="freight-table"
+        v-if="freightStore.freightQuotes.length > 0 || freightStore.errorMessage"
+        ref="freightTableRef"
+      >
+        <FreightQuoteTable />
+      </div>
     </main>
   </div>
 </template>
 <script setup lang="ts">
 import boxImage from "../assets/images/box.vue";
 import FreightForm from "@/components/FreightForm.vue";
+import FreightQuoteTable from "@/components/FreightQuoteTable.vue";
+import { useFreightStore } from "@/stores/FreightQuote";
+import { nextTick, ref, watchEffect } from "vue";
+
+const freightStore = useFreightStore();
+const freightTableRef = ref<HTMLElement | null>(null);
+
+const scrollToTable = () => {
+  if (freightTableRef.value) {
+    freightTableRef.value.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+};
+
+watchEffect(() => {
+  if (freightStore.freightQuotes.length) {
+    console.log("Novas cotações foram adicionadas!");
+    nextTick(() => {
+      scrollToTable();
+    });
+  }
+});
 </script>
 <style lang="scss" scoped>
 .containerPage {
@@ -44,7 +75,7 @@ import FreightForm from "@/components/FreightForm.vue";
     position: relative;
     grid-area: 1 / 1 / 2 / 2;
     height: 100%;
-    background: url("../assets/images/background.jpeg") no-repeat center center;
+    background: url("../assets/images/background.webp") no-repeat center center;
     background-size: cover;
     animation: slideDown 1s ease-out forwards;
 
@@ -73,8 +104,8 @@ import FreightForm from "@/components/FreightForm.vue";
       background-color: rgba(17, 17, 17, 0.1);
 
       img {
-        width: 75px;
-        height: auto;
+        width: 80px;
+        height: 56px;
       }
 
       a {
@@ -109,12 +140,15 @@ import FreightForm from "@/components/FreightForm.vue";
     padding-bottom: 2rem;
     opacity: 0;
     animation: fadeInMain 1s 1s forwards;
+    gap: 1rem;
+    width: 100%;
 
     .freight-card {
       z-index: 100;
-      background-color: #fff;
+      background: #fff;
       border-radius: 0.5rem;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.23);
+      border: 1px solid #e9ecef;
+      box-shadow: 0 0.5rem 1.25rem 0 rgba(183, 198, 206, 0.3);
       padding: 15px;
       width: 80%;
       max-width: 1140px;
@@ -142,6 +176,17 @@ import FreightForm from "@/components/FreightForm.vue";
           margin-left: auto;
         }
       }
+    }
+    .freight-table {
+      z-index: 100;
+      background: #fff;
+      border: 1px solid #e9ecef;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.5rem 1.25rem 0 rgba(183, 198, 206, 0.3);
+      padding: 15px;
+      width: 80%;
+      max-width: 1140px;
+      min-height: 25rem;
     }
   }
 
@@ -180,6 +225,14 @@ import FreightForm from "@/components/FreightForm.vue";
 @media (max-width: 799px) {
   .containerPage .freight-main .freight-card .freight-content {
     grid-template-columns: 1fr;
+  }
+  .containerPage .freight-main .freight-table {
+    background: transparent;
+    border: 1px solid #e9ecef;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    flex-wrap: wrap;
   }
 
   .containerPage .freight-main .title-header {

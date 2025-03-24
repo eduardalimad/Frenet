@@ -44,4 +44,21 @@ declare module 'cep-types' {
     ShipmentInvoiceValue: number;
     ShippingItemArray: ShippingItem[];
   }
+  export interface FreightQuote {
+    ServiceCode: string;
+    ServiceDescription: string;
+    Carrier: string;
+    CarrierCode: string;
+    ShippingPrice: number;
+    DeliveryTime: any;
+    Msg: string;
+    Error: boolean;
+    OriginalDeliveryTime: string;
+    OriginalShippingPrice: number;
+    ResponseTime: string;
+    AllowBuyLabel: boolean;
+    DeliveryBranchOfficeCarrierId: number;
+    ProtectionValue: number;
+    PresentationalPrice: number;
+  }
 }
