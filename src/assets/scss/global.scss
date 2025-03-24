@@ -1,24 +1,15 @@
-@use './base.scss';
+@forward "variables";
 
 #app {
   width: 100%;
   height: 100vh;
-  margin: 0 auto;
-  padding: 2rem;
   font-weight: normal;
-}
-
-.green {
-  text-decoration: none;
-  color: base.$color-green;
-  transition: 0.4s;
-  padding: 3px;
 }
 
 
 @media (hover: hover) {
   a:hover {
-    background-color: base.$color-green-hover;
+    background-color: var(--color-green-hover);
     opacity: 0.8;
   }
 }
