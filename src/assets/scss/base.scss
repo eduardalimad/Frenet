@@ -7,8 +7,8 @@
 
 body {
   min-height: 100vh;
-  color: var(--color-default-text);
-  background: var(--color-background);
+  color: $color-default-text;
+  background: $color-background;
   transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;
   font-family:
@@ -46,7 +46,7 @@ body {
   position: absolute;
   right: 10px;
   pointer-events: none;
-  color: #888;
+  color: #64748b ;
 
 }
 input{
@@ -71,3 +71,7 @@ input{
 .p-inputtext:enabled:focus{
   color:  #334155!important;
 }
+.p-floatlabel input:-webkit-autofill + label {
+  color: #64748b !important;
+}
+

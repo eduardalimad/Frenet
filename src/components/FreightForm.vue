@@ -78,9 +78,11 @@ import { debounce, isEqual } from "lodash";
 import NumericInput from "@/components/NumericInput.vue";
 import MaskedInput from "@/components/MaskedInput.vue";
 import http from "../services/apiService.ts";
-import type { Address, CepInfo, CepState, ShipmentRequest, ShippingDataInput,  } from "cep-types";
+import type { Address, CepInfo, CepState, ShipmentRequest, ShippingDataInput } from "cep-types";
 import { useLoadingStore } from "@/stores/loading.ts";
+import { useFreightStore } from "@/stores/FreightQuote.ts";
 
+const freightStore = useFreightStore();
 const loadingStore = useLoadingStore();
 const originCep = ref("");
 const destinationCep = ref("");
@@ -125,19 +127,19 @@ const submitRequest = async () => {
   try {
     const response = await http.listProvidingQuotes(requestData);
     console.log(response.data);
+    freightStore.addFreightQuotes(response.data.ShippingSevicesArray);
   } catch (error) {
     console.error(error);
-  }
-  finally {
+  } finally {
     loadingStore.stopLoading();
-}
+  }
 };
 
 const isButtonActive = ref(false);
 
 const isButtonDisabled = computed(() => {
-  const isFilled = Object.values(shippingData.value).every(value => {
-    if (typeof value === 'number') {
+  const isFilled = Object.values(shippingData.value).every((value) => {
+    if (typeof value === "number") {
       return value !== 0;
     }
     return value !== null && value !== "" && value !== undefined;
@@ -153,7 +155,11 @@ watch(isButtonActive, (newValue) => {
   console.log("Button is now " + (newValue ? "enabled" : "disabled"));
 });
 
-const processCepResponse = (json: CepInfo, cepType: string, states: { [key: string]: CepState }) => {
+const processCepResponse = (
+  json: CepInfo,
+  cepType: string,
+  states: { [key: string]: CepState }
+) => {
   const isValid = json.City && json.UF;
   const field = states[cepType];
 
@@ -161,7 +167,7 @@ const processCepResponse = (json: CepInfo, cepType: string, states: { [key: stri
     field.cep.value = `${json.City}/${json.UF}`;
     field.error.value = false;
   } else {
-    field.cep.value = "CEP não encontrado";;
+    field.cep.value = "CEP não encontrado";
     field.error.value = true;
   }
 };
@@ -189,7 +195,6 @@ const validateCep = async (cepType: string) => {
   } catch (error) {
     console.error("Erro ao buscar o CEP:", error);
   }
-
 };
 
 const debouncedRequest = debounce(validateCep, 1000);
