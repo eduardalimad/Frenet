@@ -10,17 +10,16 @@ const http = axios.create({
 
 http.interceptors.request.use(
   function (config) {
-    let token = import.meta.env.VITE_TOKEN;
+    const token = import.meta.env.VITE_TOKEN;
     if (token) {
-      config.headers.token = token;
+      config.headers['token'] = token;
     }
 
     return config;
   },
   function (error) {
-    console.log(error);
     return Promise.reject(error);
   }
-)
+);
 
-export { http }
+export { http };

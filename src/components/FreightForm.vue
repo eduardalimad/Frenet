@@ -73,7 +73,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { debounce, isEqual } from "lodash";
 import NumericInput from "@/components/NumericInput.vue";
 import MaskedInput from "@/components/MaskedInput.vue";
@@ -126,7 +126,6 @@ const submitRequest = async () => {
   const requestData = prepareRequest(shippingData.value);
   try {
     const response = await http.listProvidingQuotes(requestData);
-    console.log(response.data);
     freightStore.addFreightQuotes(response.data.ShippingSevicesArray);
   } catch (error) {
     console.error(error);
@@ -151,9 +150,6 @@ const isButtonDisabled = computed(() => {
   return !isButtonActive.value;
 });
 
-watch(isButtonActive, (newValue) => {
-  console.log("Button is now " + (newValue ? "enabled" : "disabled"));
-});
 
 const processCepResponse = (
   json: CepInfo,

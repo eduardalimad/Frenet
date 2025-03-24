@@ -53,7 +53,6 @@ const scrollToTable = () => {
 
 watchEffect(() => {
   if (freightStore.freightQuotes.length) {
-    console.log("Novas cotações foram adicionadas!");
     nextTick(() => {
       scrollToTable();
     });
