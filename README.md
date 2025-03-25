@@ -1,61 +1,48 @@
-# frenet
+# Frenet
+Este projeto foi desenvolvido utilizando Vue 3 com Vite. Trata-se de uma aplicação simples para simulação de frete, consistindo em um formulário de busca e exibição dos resultados de cotações.
 
-This template should help get you started developing with Vue 3 in Vite.
+### 🛠️ Tecnologias Utilizadas
+**Frontend:** Vue.js / Vite / Pinia / SCSS / PrimeVue
+
+**Backend:** Node.js 
+
+**Outras:** Axios, Lodash, etc.
 
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-## Type Support for `.vue` Imports in TS
+## 🚀 Como rodar o frontend
+### Variáveis de Ambiente no Front
+Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de ambiente no seu .env <br>
+`VITE_BASE_URL` </br>
+`VITE_TOKEN`
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+Siga os passos abaixo para rodar o frontend do projeto:
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+ ```bash
+git clone https://github.com/eduardalimad/Frenet.git
+cd frontend
 npm install
+npm run dev 
 ```
+Acesse o localhost 
 
-### Compile and Hot-Reload for Development
+## 🔰 Como rodar o backend
+### Variáveis de Ambiente
+Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de ambiente no seu .env <br>
+`FRENET_TOKEN` <br>
+`FRENET_BASE_URL`
 
-```sh
-npm run dev
+Siga os passos abaixo para rodar o backend do projeto:
+
+ ```bash
+cd backend
+npm install
+npm run dev 
 ```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
+## 🧪 Testes
+Como rodar os testes unitários:
 ```sh
 npm run test:unit
-```
-
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
-
-```sh
-npm run test:e2e:dev
-```
-
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
-npm run build
-npm run test:e2e
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
 ```
