@@ -1,6 +1,6 @@
 <template>
   <div class="containerPage">
-    <header class="header">
+    <header class="header" v-once>
       <nav class="navbar">
         <img src="../assets/images/logo-frenet.png" alt="" />
         <div>
@@ -26,7 +26,7 @@
             @submit-request="debouncedRequest"
           />
           <div class="image-box">
-            <boxImage />
+            <boxImage v-once />
           </div>
         </div>
       </section>
@@ -192,6 +192,11 @@ function formatToBRL(value: number) {
 
 </script>
 <style lang="scss" scoped>
+$primary-bg-color: #fff;
+$primary-border-color: #e9ecef;
+$shadow-color: rgba(183, 198, 206, 0.3);
+$transition-speed: 0.3s;
+
 .containerPage {
   display: grid;
   grid-template-columns: 1fr;
@@ -243,7 +248,7 @@ function formatToBRL(value: number) {
         color: white;
         text-decoration: none;
         padding: 10px;
-        transition: background-color 0.3s ease, width 0.3s ease;
+        transition: background-color $transition-speed ease, width $transition-speed ease;
       }
 
       a:hover {
@@ -274,50 +279,39 @@ function formatToBRL(value: number) {
     gap: 1rem;
     width: 100%;
 
-    .freight-card {
+    .freight-card,
+    .freight-table {
       z-index: 100;
-      background: #fff;
+      background: $primary-bg-color;
       border-radius: 0.5rem;
-      border: 1px solid #e9ecef;
-      box-shadow: 0 0.5rem 1.25rem 0 rgba(183, 198, 206, 0.3);
+      border: 1px solid $primary-border-color;
+      box-shadow: 0 0.5rem 1.25rem 0 $shadow-color;
       padding: 15px;
       width: 80%;
       max-width: 1140px;
       min-height: 25rem;
       margin-top: 2rem;
-
-      .card-description,
-      .card-subtitle {
-        display: flex;
-        justify-content: center;
-      }
-
-      .freight-content {
-        display: grid;
-        grid-template-columns: 1fr repeat(auto-fit, minmax(20rem, 1fr));
-        grid-column-gap: 0;
-
-        .form-freight {
-          grid-area: 1 / 1 / 2 / 2;
-        }
-
-        .image-box {
-          grid-area: 1 / 2 / 2 / 3;
-          width: 75%;
-          margin-left: auto;
-        }
-      }
     }
-    .freight-table {
-      z-index: 100;
-      background: #fff;
-      border: 1px solid #e9ecef;
-      border-radius: 0.5rem;
-      box-shadow: 0 0.5rem 1.25rem 0 rgba(183, 198, 206, 0.3);
-      padding: 15px;
-      width: 80%;
-      max-width: 1140px;
-      min-height: 25rem;
+    .card-subtitle,
+    .card-description {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .freight-content {
+      display: grid;
+      grid-template-columns: 1fr repeat(auto-fit, minmax(20rem, 1fr));
+      grid-column-gap: 0;
+
+      .form-freight {
+        grid-area: 1 / 1 / 2 / 2;
+      }
+
+      .image-box {
+        grid-area: 1 / 2 / 2 / 3;
+        width: 75%;
+        margin-left: auto;
+      }
     }
   }
 
@@ -359,7 +353,6 @@ function formatToBRL(value: number) {
   }
   .containerPage .freight-main .freight-table {
     background: transparent;
-    border: 1px solid #e9ecef;
     border: none;
     box-shadow: none;
     width: 100%;
