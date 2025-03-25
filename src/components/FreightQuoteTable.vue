@@ -6,11 +6,10 @@
     </div>
     <table v-else>
       <thead>
-        <tr>
-          <th>Modalidade</th>
-          <th>Prazo</th>
-          <th>Preço</th>
-          <th></th>
+        <tr >
+          <th v-for="(header, index) in titles" :key="index">
+          {{ header.title }}
+        </th>
         </tr>
       </thead>
       <tbody>
@@ -18,11 +17,11 @@
           <td class="carrier-information">
             <img
               class="img-logo"
-              :src="`https://s3-sa-east-1.amazonaws.com/painel.frenet.com.br/Content/images/${quote.CarrierCode}-small.png`"
+              :src="`https://caminho/Content/images/${quote.CarrierCode}-small.png`"
               alt="Correios"
             />
             <section class="title">
-              <span class="destribuidora">{{ quote.Carrier }} via Frenet</span>
+              <span class="destribuidora">{{ quote.Carrier }} </span>
               <span class="legend">Poste na agência mais próxima</span>
             </section>
           </td>
@@ -41,22 +40,26 @@
 
 <script setup lang="ts">
 import { useFreightStore } from "@/stores/FreightQuote";
-import { ref, watch } from "vue";
+import type { FreightQuote, TableHeader } from "cep-types";
+import type { PropType } from "vue";
 
 const freightStore = useFreightStore();
-const data = ref(freightStore.freightQuotes);
 
-watch(
-  () => freightStore.freightQuotes,
-  (newQuotes) => {
-    data.value = newQuotes;
+defineProps({
+  titles: {
+    type: Array as PropType<TableHeader[]>,
+    required: true
   },
-  { immediate: true }
-);
+  formatToBRL: {
+    type: Function as PropType<(value: number) => string>,
+    required: true
+  },
+  data: {
+    type: Array as PropType<FreightQuote[]>,
+    required: true
+  }
+});
 
-function formatToBRL(value: number) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 </script>
 
 <style lang="scss" scoped>
