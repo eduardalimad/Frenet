@@ -1,13 +1,4 @@
 declare module 'cep-types' {
-  export interface CepInfo {
-    CEP: string;
-    City: string;
-    District: string;
-    Message: string;
-    Street: string;
-    UF: string;
-
-  }
   export interface CepState {
     cep: { value: string };
     error: { value: boolean };
@@ -60,5 +51,9 @@ declare module 'cep-types' {
     DeliveryBranchOfficeCarrierId: number;
     ProtectionValue: number;
     PresentationalPrice: number;
+  }
+
+  export interface FreightQuotesResponse {
+    ShippingSevicesArray: FreightQuote[];
   }
 }

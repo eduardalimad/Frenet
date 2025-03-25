@@ -6,7 +6,7 @@
         idLabel="cepOrigem"
         v-model="shippingData.originCep"
         mask="99999-999"
-        @change="() => debouncedRequest('origem')"
+        @focusout="validateCep(shippingData.originCep, 'origem')"
         :message="originCep"
       />
 
@@ -15,7 +15,7 @@
         idLabel="cepDestino"
         v-model="shippingData.destinationCep"
         mask="99999-999"
-        @change="() => debouncedRequest('destino')"
+        @focusout="validateCep(shippingData.destinationCep, 'destino')"
         :message="destinationCep"
       />
 
@@ -65,7 +65,7 @@
       <Button
         label="Buscar"
         severity="info"
-        @click="submitRequest"
+        @click="debouncedRequest"
         class="btn-search"
         :disabled="isButtonDisabled"
       />
@@ -78,7 +78,7 @@ import { debounce, isEqual } from "lodash";
 import NumericInput from "@/components/NumericInput.vue";
 import MaskedInput from "@/components/MaskedInput.vue";
 import http from "../services/apiService.ts";
-import type { Address, CepInfo, CepState, ShipmentRequest, ShippingDataInput } from "cep-types";
+import type { Address, CepState, ShipmentRequest, ShippingDataInput } from "cep-types";
 import { useLoadingStore } from "@/stores/loading.ts";
 import { useFreightStore } from "@/stores/FreightQuote.ts";
 
@@ -101,41 +101,7 @@ const shippingData = ref<ShippingDataInput>({
 });
 const previousShippingData = ref({ ...shippingData.value });
 
-const mapShippingData = (data: ShippingDataInput) => {
-  const { height, length, quantity, weight, width } = data;
-
-  return {
-    Height: height || 0,
-    Length: length || 0,
-    Quantity: quantity || 0,
-    Weight: weight || 0,
-    Width: width || 0,
-  };
-};
-const prepareRequest = (data: ShippingDataInput): ShipmentRequest => {
-  return {
-    SellerCep: extractNumbers(data.originCep),
-    RecipientCep: extractNumbers(data.destinationCep),
-    ShipmentInvoiceValue: data.value || 0,
-    ShippingItemArray: [mapShippingData(data)],
-    RecipientCountry: "BR",
-  };
-};
-const submitRequest = async () => {
-  loadingStore.startLoading();
-  const requestData = prepareRequest(shippingData.value);
-  try {
-    const response = await http.listProvidingQuotes(requestData);
-    freightStore.addFreightQuotes(response.data.ShippingSevicesArray);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    loadingStore.stopLoading();
-  }
-};
-
 const isButtonActive = ref(false);
-
 const isButtonDisabled = computed(() => {
   const isFilled = Object.values(shippingData.value).every((value) => {
     if (typeof value === "number") {
@@ -150,38 +116,12 @@ const isButtonDisabled = computed(() => {
   return !isButtonActive.value;
 });
 
+const validateCep = async (cep: string, cepType: string) => {
+  cep = extractNumbers(cep);
 
-const processCepResponse = (
-  json: CepInfo,
-  cepType: string,
-  states: { [key: string]: CepState }
-) => {
-  const isValid = json.City && json.UF;
-  const field = states[cepType];
-
-  if (isValid) {
-    field.cep.value = `${json.City}/${json.UF}`;
-    field.error.value = false;
-  } else {
-    field.cep.value = "CEP não encontrado";
-    field.error.value = true;
-  }
-};
-
-function extractNumbers(str: string) {
-  return str.toString().replace(/\D/g, "");
-}
-
-const validateCep = async (cepType: string) => {
   try {
-    const cep =
-      cepType === "origem"
-        ? extractNumbers(shippingData.value.originCep)
-        : extractNumbers(shippingData.value.destinationCep);
-
     if (cep.length === 8) {
-      const res = await http.searchCep(cep);
-      const data: Address = res.data;
+      const { data } = await http.searchCep(cep);
 
       processCepResponse(data, cepType, {
         origem: { cep: originCep, error: isOriginCepInvalid },
@@ -192,8 +132,63 @@ const validateCep = async (cepType: string) => {
     console.error("Erro ao buscar o CEP:", error);
   }
 };
+function extractNumbers(str: string) {
+  return str.toString().replace(/\D/g, "");
+};
 
-const debouncedRequest = debounce(validateCep, 1000);
+const processCepResponse = (
+  adress: Address,
+  cepType: string,
+  states: { [key: string]: CepState }
+) => {
+  const isValid = adress.City && adress.UF;
+  const field = states[cepType];
+
+  if (isValid) {
+    field.cep.value = `${adress.City}/${adress.UF}`;
+    field.error.value = false;
+  } else {
+    field.cep.value = "CEP não encontrado";
+    field.error.value = true;
+  }
+};
+
+const submitRequest = async () => {
+  loadingStore.startLoading();
+  const requestData = prepareRequest(shippingData.value);
+
+  try {
+    const {data} = await http.listProvidingQuotes(requestData);
+    freightStore.addFreightQuotes(data.ShippingSevicesArray);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loadingStore.stopLoading();
+  }
+};
+
+const debouncedRequest = debounce(submitRequest, 1000);
+
+const prepareRequest = (data: ShippingDataInput): ShipmentRequest => {
+  return {
+    SellerCep: extractNumbers(data.originCep),
+    RecipientCep: extractNumbers(data.destinationCep),
+    ShipmentInvoiceValue: data.value || 0,
+    ShippingItemArray: [mapShippingData(data)],
+    RecipientCountry: "BR",
+  };
+};
+
+const mapShippingData = ({ height, length, quantity, weight, width }: ShippingDataInput) => {
+  return {
+    Height: height || 0,
+    Length: length || 0,
+    Quantity: quantity || 0,
+    Weight: weight || 0,
+    Width: width || 0,
+  };
+};
+
 </script>
 <style lang="scss" scoped>
 .freight-form {
