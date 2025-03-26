@@ -4,60 +4,60 @@
       <MaskedInput
         title="CEP de origem"
         idLabel="cepOrigem"
-        v-model="shippingData.originCep"
+        v-model="quoteForm.originCep"
         mask="99999-999"
-        @focusout="$emit('validate-cep', shippingData.originCep, 'origem')"
+        @focusout="$emit('validate-cep', quoteForm.originCep, 'origem')"
         :message="originCep"
       />
 
       <MaskedInput
         title="CEP de destino"
         idLabel="cepDestino"
-        v-model="shippingData.destinationCep"
+        v-model="quoteForm.destinationCep"
         mask="99999-999"
-        @focusout="$emit('validate-cep', shippingData.destinationCep, 'destino')"
+        @focusout="$emit('validate-cep', quoteForm.destinationCep, 'destino')"
         :message="destinationCep"
       />
 
       <NumericInput
         title="Largura"
         idLabel="largura"
-        v-model="shippingData.width"
+        v-model="quoteForm.width"
         suffix=" cm"
         keyfilterType="int"
       />
       <NumericInput
         title="Altura"
         idLabel="altura"
-        v-model="shippingData.height"
+        v-model="quoteForm.height"
         suffix=" cm"
         keyfilterType="int"
       />
       <NumericInput
         title="Comprimento"
         idLabel="comprimento"
-        v-model="shippingData.length"
+        v-model="quoteForm.length"
         suffix=" cm"
         keyfilterType="int"
       />
       <NumericInput
         title="Peso"
         idLabel="peso"
-        v-model="shippingData.weight"
+        v-model="quoteForm.weight"
         suffix=" kg"
         keyfilterType="money"
       />
       <NumericInput
         title="Quantidade"
         idLabel="qtd"
-        v-model="shippingData.quantity"
+        v-model="quoteForm.quantity"
         suffix=" un"
         keyfilterType="int"
       />
       <NumericInput
         title="Valor"
         idLabel="valor"
-        v-model="shippingData.value"
+        v-model="quoteForm.value"
         suffix=" R$"
         keyfilterType="money"
       />
@@ -76,7 +76,7 @@ import NumericInput from "@/components/NumericInput.vue";
 import MaskedInput from "@/components/MaskedInput.vue";
 
 defineProps({
-  shippingData: {
+  quoteForm: {
     type: Object,
     default: () => ({
       originCep: "",
