@@ -37,6 +37,7 @@ body {
   height: 2.5rem;
   width: 100%;
 
+
 }
 .p-floatlabel-on{
   width: 100%;
@@ -47,6 +48,7 @@ body {
   right: 10px;
   pointer-events: none;
   color: #64748b ;
+  margin-left: 8px;
 
 }
 input{
@@ -55,15 +57,7 @@ input{
 .container-input{
   width: 100%;
 }
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
 
-.suffix {
-  margin-left: 8px;
-}
 .p-floatlabel:has(input:focus) label, .p-inputtext:enabled:focus{
   border-color: $color-cyano !important;
   color:  $color-cyano !important;
