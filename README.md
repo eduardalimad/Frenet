@@ -22,25 +22,16 @@ Siga os passos abaixo para rodar o frontend do projeto:
 
  ```bash
 git clone https://github.com/eduardalimad/Frenet.git
-cd frontend
+cd ./frenet
 npm install
 npm run dev 
 ```
 Acesse o localhost 
 
-## 🔰 Como rodar o backend
-### Variáveis de Ambiente
-Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de ambiente no seu .env <br>
-`FRENET_TOKEN` <br>
-`FRENET_BASE_URL`
+### 🔰 Como executar o backend
+Para iniciar o proxy, você precisará acessar outro repositório. Caso seja necessário, aqui está o link:
+[ProxyFrenet](https://github.com/eduardalimad/proxy-api-frenet/)
 
-Siga os passos abaixo para rodar o backend do projeto:
-
- ```bash
-cd backend
-npm install
-npm run dev 
-```
 ## 🧪 Testes
 Como rodar os testes unitários:
 ```sh
