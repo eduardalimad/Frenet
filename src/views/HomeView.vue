@@ -18,7 +18,7 @@
         <div class="freight-content">
           <FreightForm
             class="form-freight"
-            :shippingData="shippingData"
+            :quoteForm="shippingData"
             :originCep="originCep"
             :destinationCep="destinationCep"
             :isButtonDisabled="isButtonDisabled"
@@ -33,9 +33,14 @@
       <div
         class="freight-table"
         ref="freightTableRef"
-        v-if="freightStore.freightQuotes.length > 0 || freightStore.errorMessage"
+        v-if="freightQuotes.length > 0 || errorMessage"
       >
-        <FreightQuoteTable :titles="tableHeaders" :data="data" :formatToBRL="formatToBRL" />
+        <FreightQuoteTable
+          :titles="tableHeaders"
+          :data="freightQuotes"
+          :formatToBRL="formatToBRL"
+          :error="errorMessage"
+        />
       </div>
     </main>
   </div>
@@ -43,15 +48,14 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch, watchEffect } from "vue";
 import { debounce } from "lodash";
+import { useToast } from "vue-toastification";
 import http from "@/services/apiService";
-import { useFreightStore } from "@/stores/FreightQuote";
 import { useLoadingStore } from "@/stores/loading.ts";
 import FreightForm from "@/components/FreightForm.vue";
 import FreightQuoteTable from "@/components/FreightQuoteTable.vue";
 import boxImage from "@/assets/images/box.vue";
 import type { Address, CepState, ShipmentRequest, ShippingDataInput, TableHeader } from "cep-types";
 
-const freightStore = useFreightStore();
 const loadingStore = useLoadingStore();
 
 const freightTableRef = ref<HTMLElement | null>(null);
@@ -73,9 +77,10 @@ const tableHeaders = ref<TableHeader[]>([
   { title: "Modalidade" },
   { title: "Prazo" },
   { title: "Preço" },
-  { title: "" }
+  { title: "" },
 ]);
-const data = ref(freightStore.freightQuotes);
+const freightQuotes = ref();
+const errorMessage = ref("");
 
 // Lógica do formulário
 const isButtonDisabled = computed(() => {
@@ -87,9 +92,11 @@ const isButtonDisabled = computed(() => {
   });
   return !isFilled;
 });
+const toast = useToast();
 
 const validateCep = async (cep: string, cepType: string) => {
   cep = extractNumbers(cep);
+
   try {
     if (cep.length === 8) {
       const { data } = await http.searchCep(cep);
@@ -130,15 +137,25 @@ const submitRequest = async () => {
 
   try {
     const { data } = await http.listProvidingQuotes(requestData);
-    freightStore.addFreightQuotes(data.ShippingSevicesArray);
+    const validQuotes = data.ShippingSevicesArray.filter((quote) => !quote.Error);
+
+    if (validQuotes.length === 0) {
+      errorMessage.value =
+        "Lamentamos, mas não foi possível encontrar nenhuma transportadora disponível para o seu envio.";
+      freightQuotes.value = [];
+    } else {
+      errorMessage.value = "";
+      freightQuotes.value = validQuotes;
+    }
   } catch (error) {
     console.error(error);
+    toast.error("Erro ao realizar a requisição. Tente novamente mais tarde.", { timeout: 5000 });
   } finally {
     loadingStore.stopLoading();
   }
 };
 
-const debouncedRequest = debounce(submitRequest, 1000);
+const debouncedRequest = debounce(submitRequest, 500);
 
 const prepareRequest = (data: ShippingDataInput): ShipmentRequest => {
   return {
@@ -162,7 +179,7 @@ const mapShippingData = ({ height, length, quantity, weight, width }: ShippingDa
 
 // Lógica da tabela
 watchEffect(() => {
-  if (freightStore.freightQuotes.length) {
+  if (freightQuotes.value) {
     nextTick(() => {
       scrollToTable();
     });
@@ -178,9 +195,9 @@ const scrollToTable = () => {
 };
 
 watch(
-  () => freightStore.freightQuotes,
+  () => freightQuotes,
   (newQuotes) => {
-    data.value = newQuotes;
+    freightQuotes.value = newQuotes;
   },
   { immediate: true }
 );
@@ -188,8 +205,6 @@ watch(
 function formatToBRL(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
-
-
 </script>
 <style lang="scss" scoped>
 $primary-bg-color: #fff;
