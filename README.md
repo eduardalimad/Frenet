@@ -15,8 +15,8 @@ Este projeto foi desenvolvido utilizando Vue 3 com Vite. Trata-se de uma aplica�
 ## 🚀 Como rodar o frontend
 ### Variáveis de Ambiente no Front
 Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de ambiente no seu .env <br>
-`VITE_BASE_URL` </br>
-`VITE_TOKEN`
+`VITE_BASE_URL` - base url da proxy </br>
+`VITE_TOKEN` - token da api Frenet
 
 Siga os passos abaixo para rodar o frontend do projeto:
 
