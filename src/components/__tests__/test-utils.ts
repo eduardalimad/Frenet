@@ -10,7 +10,6 @@ import InputMask from 'primevue/inputmask';
 import FloatLabel from 'primevue/floatlabel';
 import Message from 'primevue/message';
 import Button from 'primevue/button';
-import { useFreightStore } from '@/stores/FreightQuote';
 
 export const createWrapper = (
   component: Component,
@@ -20,8 +19,6 @@ export const createWrapper = (
   const app = createApp(component);
   app.use(PrimeVue);
   app.use(pinia);
-
-  const freightStore = useFreightStore(pinia);
 
 
   return mount(component, {

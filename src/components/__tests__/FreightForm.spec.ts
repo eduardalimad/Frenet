@@ -9,7 +9,7 @@ describe('FreightForm.vue', () => {
 
   beforeEach(() => {
     wrapper = createWrapper(FreightForm, {});
-    shippingData = wrapper.vm.shippingData;
+    shippingData = wrapper.vm.quoteForm;
   });
 
   it('deve renderizar corretamente os inputs', () => {

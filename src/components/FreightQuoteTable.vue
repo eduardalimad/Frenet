@@ -1,28 +1,25 @@
 <template>
   <div>
-    <div v-if="freightStore.errorMessage" class="error-message">
+    <div v-if="error" class="error-message">
       <img src="../assets/images/alert.webp" loading="lazy" alt="Ilustração" class="error-image" />
-      <p>{{ freightStore.errorMessage }}</p>
+      <p>{{ error }}</p>
     </div>
     <table v-else>
       <thead>
         <tr>
-          <th>Modalidade</th>
-          <th>Prazo</th>
-          <th>Preço</th>
-          <th></th>
+          <th v-for="(header, index) in titles" :key="index">
+            {{ header.title }}
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="quote in data" :key="quote.ServiceCode">
           <td class="carrier-information">
-            <img
-              class="img-logo"
+            <img class="img-logo"
               :src="`https://s3-sa-east-1.amazonaws.com/painel.frenet.com.br/Content/images/${quote.CarrierCode}-small.png`"
-              alt="Correios"
-            />
+              alt="Correios" />
             <section class="title">
-              <span class="destribuidora">{{ quote.Carrier }} via Frenet</span>
+              <span class="destribuidora">{{ quote.Carrier }} </span>
               <span class="legend">Poste na agência mais próxima</span>
             </section>
           </td>
@@ -40,23 +37,28 @@
 </template>
 
 <script setup lang="ts">
-import { useFreightStore } from "@/stores/FreightQuote";
-import { ref, watch } from "vue";
+import type { FreightQuote, TableHeader } from "cep-types";
+import type { PropType } from "vue";
 
-const freightStore = useFreightStore();
-const data = ref(freightStore.freightQuotes);
-
-watch(
-  () => freightStore.freightQuotes,
-  (newQuotes) => {
-    data.value = newQuotes;
+defineProps({
+  titles: {
+    type: Array as PropType<TableHeader[]>,
+    required: true
   },
-  { immediate: true }
-);
+  formatToBRL: {
+    type: Function as PropType<(value: number) => string>,
+    required: true
+  },
+  data: {
+    type: Array as PropType<FreightQuote[]>,
+    required: true
+  },
+  error: {
+    type: String,
+    required: true
+  }
+});
 
-function formatToBRL(value: number) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
 </script>
 
 <style lang="scss" scoped>
@@ -100,6 +102,7 @@ table {
     display: grid;
   }
 }
+
 .error-message {
   display: flex;
   align-items: center;
@@ -110,6 +113,7 @@ table {
   color: #721c24;
   border-radius: 8px;
   margin: 1rem;
+
   .error-image {
     width: 20rem;
     max-width: 100%;
@@ -176,12 +180,15 @@ table {
     align-items: flex-start;
     border-bottom: none;
   }
+
   .error-message {
     flex-direction: column;
     padding: 1rem 0.5rem;
+
     p {
       font-size: 1rem;
     }
+
     .error-image {
       width: 15rem;
     }

@@ -56,4 +56,7 @@ declare module 'cep-types' {
   export interface FreightQuotesResponse {
     ShippingSevicesArray: FreightQuote[];
   }
+  export interface TableHeader {
+    title: string;
+  }
 }

@@ -16,7 +16,15 @@
         <p class="card-description">Faça sua cotação nas principais transportadoras do país</p>
 
         <div class="freight-content">
-          <FreightForm class="form-freight" />
+          <FreightForm
+            class="form-freight"
+            :quoteForm="shippingData"
+            :originCep="originCep"
+            :destinationCep="destinationCep"
+            :isButtonDisabled="isButtonDisabled"
+            @validate-cep="validateCep"
+            @submit-request="debouncedRequest"
+          />
           <div class="image-box">
             <boxImage v-once />
           </div>
@@ -24,24 +32,159 @@
       </section>
       <div
         class="freight-table"
-        v-if="freightStore.freightQuotes.length > 0 || freightStore.errorMessage"
         ref="freightTableRef"
+        v-if="freightQuotes.length > 0 || errorMessage"
       >
-        <FreightQuoteTable />
+        <FreightQuoteTable
+          :titles="tableHeaders"
+          :data="freightQuotes"
+          :formatToBRL="formatToBRL"
+          :error="errorMessage"
+        />
       </div>
     </main>
   </div>
 </template>
 <script setup lang="ts">
-import boxImage from "../assets/images/box.vue";
+import { computed, nextTick, ref, watch, watchEffect } from "vue";
+import { debounce } from "lodash";
+import { useToast } from "vue-toastification";
+import http from "@/services/apiService";
+import { useLoadingStore } from "@/stores/loading.ts";
 import FreightForm from "@/components/FreightForm.vue";
 import FreightQuoteTable from "@/components/FreightQuoteTable.vue";
-import { useFreightStore } from "@/stores/FreightQuote";
-import { nextTick, ref, watchEffect } from "vue";
+import boxImage from "@/assets/images/box.vue";
+import type { Address, CepState, ShipmentRequest, ShippingDataInput, TableHeader } from "cep-types";
 
-const freightStore = useFreightStore();
+const loadingStore = useLoadingStore();
+
 const freightTableRef = ref<HTMLElement | null>(null);
+const originCep = ref("");
+const destinationCep = ref("");
+const isOriginCepInvalid = ref(false);
+const isDestinationCepInvalid = ref(false);
+const shippingData = ref({
+  originCep: "",
+  destinationCep: "",
+  width: null,
+  height: null,
+  length: null,
+  weight: null,
+  quantity: null,
+  value: null,
+});
+const tableHeaders = ref<TableHeader[]>([
+  { title: "Modalidade" },
+  { title: "Prazo" },
+  { title: "Preço" },
+  { title: "" },
+]);
+const freightQuotes = ref();
+const errorMessage = ref("");
 
+// Lógica do formulário
+const isButtonDisabled = computed(() => {
+  const isFilled = Object.values(shippingData.value).every((value) => {
+    if (typeof value === "number") {
+      return value !== 0;
+    }
+    return value !== null && value !== "" && value !== undefined;
+  });
+  return !isFilled;
+});
+const toast = useToast();
+
+const validateCep = async (cep: string, cepType: string) => {
+  cep = extractNumbers(cep);
+
+  try {
+    if (cep.length === 8) {
+      const { data } = await http.searchCep(cep);
+      processCepResponse(data, cepType, {
+        origem: { cep: originCep, error: isOriginCepInvalid },
+        destino: { cep: destinationCep, error: isDestinationCepInvalid },
+      });
+    }
+  } catch (error) {
+    console.error("Erro ao buscar o CEP:", error);
+  }
+};
+
+const extractNumbers = (str: string) => {
+  return str.toString().replace(/\D/g, "");
+};
+
+const processCepResponse = (
+  adress: Address,
+  cepType: string,
+  states: { [key: string]: CepState }
+) => {
+  const isValid = adress.City && adress.UF;
+  const field = states[cepType];
+
+  if (isValid) {
+    field.cep.value = `${adress.City}/${adress.UF}`;
+    field.error.value = false;
+  } else {
+    field.cep.value = "CEP não encontrado";
+    field.error.value = true;
+  }
+};
+
+const submitRequest = async () => {
+  loadingStore.startLoading();
+  const requestData = prepareRequest(shippingData.value);
+
+  try {
+    const { data } = await http.listProvidingQuotes(requestData);
+    const validQuotes = data.ShippingSevicesArray.filter((quote) => !quote.Error);
+
+    if (validQuotes.length === 0) {
+      errorMessage.value =
+        "Lamentamos, mas não foi possível encontrar nenhuma transportadora disponível para o seu envio.";
+      freightQuotes.value = [];
+    } else {
+      errorMessage.value = "";
+      freightQuotes.value = validQuotes;
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Erro ao realizar a requisição. Tente novamente mais tarde.", { timeout: 5000 });
+  } finally {
+    loadingStore.stopLoading();
+  }
+};
+
+const debouncedRequest = debounce(submitRequest, 500);
+
+const prepareRequest = (data: ShippingDataInput): ShipmentRequest => {
+  return {
+    SellerCep: extractNumbers(data.originCep),
+    RecipientCep: extractNumbers(data.destinationCep),
+    ShipmentInvoiceValue: data.value || 0,
+    ShippingItemArray: [mapShippingData(data)],
+    RecipientCountry: "BR",
+  };
+};
+
+const mapShippingData = ({ height, length, quantity, weight, width }: ShippingDataInput) => {
+  return {
+    Height: height || 0,
+    Length: length || 0,
+    Quantity: quantity || 0,
+    Weight: weight || 0,
+    Width: width || 0,
+  };
+};
+
+// Lógica da tabela
+watchEffect(() => {
+  if (freightQuotes.value) {
+    nextTick(() => {
+      scrollToTable();
+    });
+  }
+});
 const scrollToTable = () => {
   if (freightTableRef.value) {
     freightTableRef.value.scrollIntoView({
@@ -51,13 +194,17 @@ const scrollToTable = () => {
   }
 };
 
-watchEffect(() => {
-  if (freightStore.freightQuotes.length) {
-    nextTick(() => {
-      scrollToTable();
-    });
-  }
-});
+watch(
+  () => freightQuotes,
+  (newQuotes) => {
+    freightQuotes.value = newQuotes;
+  },
+  { immediate: true }
+);
+
+function formatToBRL(value: number) {
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 </script>
 <style lang="scss" scoped>
 $primary-bg-color: #fff;

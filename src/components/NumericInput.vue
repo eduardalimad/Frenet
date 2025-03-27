@@ -9,7 +9,7 @@
           :id="idLabel"
           :invalid="isTouched && !localValue"
           class="font-bold block mb-2"
-          @blur="handleBlur"
+          @blur="isTouched = true"
         />
 
         <InputText
@@ -19,7 +19,7 @@
           :id="idLabel"
           :invalid="isTouched && !localValue"
           class="font-bold block mb-2"
-          @blur="handleBlur"
+          @blur="isTouched = true"
         />
         <label :for="idLabel">{{ title }}</label>
       </FloatLabel>
@@ -49,7 +49,7 @@ const props = withDefaults(
 );
 const isTouched = ref(false);
 const localValue = ref<string | null>(
-  typeof props.modelValue === 'number' ? String(props.modelValue) : props.modelValue
+  typeof props.modelValue === "number" ? String(props.modelValue) : props.modelValue
 );
 const emit = defineEmits(["update:modelValue"]);
 
@@ -57,10 +57,6 @@ watch(localValue, (newValue: any) => {
   const valueWithDot = newValue.replace(",", ".");
   emit("update:modelValue", Number(valueWithDot));
 });
-
-const handleBlur = () => {
-  isTouched.value = true;
-};
 
 const shouldShowMessage = computed(() => {
   return isTouched.value && !localValue.value;
